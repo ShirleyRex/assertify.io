@@ -1,0 +1,12 @@
+[
+  "What is the main purpose of this code?",
+  "What are the primary inputs?",
+  "What are the expected outputs?",
+  "What error cases should be tested?",
+  "What are the edge cases?",
+  "What performance requirements exist?",
+  "What security considerations matter?",
+  "What dependencies are involved?",
+  "What validation rules apply?",
+  "What should not be tested?"
+]
