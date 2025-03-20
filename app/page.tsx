@@ -203,7 +203,7 @@ export default function Home() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4">
-              Test Case Generator
+              Assertify
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-300">
               AI-powered test case generation with boilerplate code
