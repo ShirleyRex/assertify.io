@@ -82,7 +82,7 @@ export default function ResultsPage() {
     }
 
     try {
-      const parsedCases = JSON.parse(cases);
+      const parsedCases = JSON.parse(cases) as TestCase[];
       const filteredCases = filterTestCasesBySettings(parsedCases, settings);
       setTestCases(filteredCases);
 
