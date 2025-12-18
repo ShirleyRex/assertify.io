@@ -39,13 +39,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return (
       <html lang="en">
         <head>
-          <title>Test Case Generator</title>
-          <meta name="description" content="AI-powered test case generator" />
+          <title>Assertify</title>
+          <meta name="description" content="Assertify - AI-powered test case generator" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
           />
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         </head>
         <body>
           <div className="min-h-screen flex items-center justify-center">
@@ -59,13 +60,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={isDark ? "dark" : ""}>
       <head>
-        <title>Test Case Generator</title>
-        <meta name="description" content="AI-powered test case generator" />
+        <title>Assertify</title>
+        <meta name="description" content="Assertify - AI-powered test case generator" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body>
         <ConfirmDialogProvider>
