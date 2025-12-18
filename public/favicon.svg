@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Assertify logo">
+  <defs>
+    <linearGradient id="assertifyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0f172a" />
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#assertifyGradient)" />
+  <path
+    fill="#f8fafc"
+    d="M18 44l7.6-24h12.8L46 44h-7l-1.7-6.1H26.8L25 44z"
+  />
+  <path fill="#93c5fd" d="M32 19l-5 18h10z" />
+</svg>
