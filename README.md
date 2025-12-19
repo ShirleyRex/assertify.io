@@ -56,3 +56,4 @@ Assertify is an intelligent testing assistant that analyzes your project descrip
 ## License
 
 MIT
+Minor documentation improvement.
