@@ -1,4 +1,4 @@
-# Assertify - AI-Powered Test Case Generation
+# Assertify: AI-Powered Test Case Generation
 
 Assertify is an intelligent testing assistant that analyzes your project description, asks clarifying questions, and generates comprehensive test suites across multiple testing styles and frameworks.
 
