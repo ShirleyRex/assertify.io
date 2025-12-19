@@ -15,7 +15,15 @@ jobs:
         with:
           script: |
             const body = context.payload.pull_request.body || '';
+            const labels =
+              (context.payload.pull_request.labels || []).map(l => l.name.toLowerCase());
+            const bypassLabels = ['no-issue', 'chore', 'docs', 'maintenance'];
+            const hasBypassLabel = labels.some(name => bypassLabels.includes(name));
             const keywordPattern = /(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+((#[0-9]+)|([\w.-]+\/[\w.-]+#\d+))/i;
-            if (!keywordPattern.test(body)) {
-              core.setFailed('Add a closing keyword like "Closes #123" to the PR description.');
+            const hasKeyword = keywordPattern.test(body);
+
+            if (!hasKeyword && !hasBypassLabel) {
+              core.setFailed(
+                'Add a closing keyword like "Closes #123" to the PR description or apply the "no-issue" label for work not tied to a tracked issue.',
+              );
             }
