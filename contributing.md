@@ -6,7 +6,7 @@ Thanks for considering a contribution to Assertify! This document outlines how t
 
 - Report bugs or request features by opening an Issue with clear reproduction steps or user stories.
 - Improve documentation, copy, or accessibility anywhere in the repo.
-- Tackle open Issues that are tagged `good first issue`, `help wanted`, or any topic you feel comfortable owning.
+- Tackle open issues that are tagged `good first issue`, `help wanted`, or any topic you feel comfortable owning.
 
 ## Prerequisites
 
