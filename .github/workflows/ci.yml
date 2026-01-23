@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+      - 0.x
 
 jobs:
   quality-checks:
