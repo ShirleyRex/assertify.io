@@ -38,6 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - _Placeholder_: Detail security-related fixes or notices.
 
+## [0.1.1] - 2026-01-25
+
+### Changed
+
+- themeMode: Changed the position of themeMode switcher and also added system mode to it.
+- Settings Button: Changed the position of the settings button so as to have uniformity on both web and mobile app.
+- Mobile: Changed mobile version to fullscreen.
+
 ## [0.1.0] - 2026-01-05
 
 ### Added
