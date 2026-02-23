@@ -2,10 +2,13 @@
 
 <br />
 <br />
-<a href="https://vercel.com/oss">
-  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
-</a>
-
+<div align="center">
+  <a href="https://vercel.com/oss">
+    <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
+  </a>
+</div>
+<br />
+<br />
 Assertify is an intelligent testing assistant that analyzes your project description, asks clarifying questions, and generates comprehensive test suites across multiple testing styles and frameworks.
 
 ## Features
