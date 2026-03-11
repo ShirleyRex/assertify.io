@@ -10,6 +10,7 @@ import { buildAutoContext } from "@/lib/autoContext";
 import { useSettings } from "@/components/SettingsProvider";
 import { filterTestCasesBySettings } from "@/lib/testCaseUtils";
 import { useThemeMode } from "@/components/ThemeProvider";
+import { PROVIDER_META, PROVIDER_KEYS } from "@/lib/settings";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -25,7 +26,7 @@ export default function Home() {
   const router = useRouter();
   const { addToast } = useToast();
   const { confirm } = useConfirmDialog();
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
   const { themeMode, themeLabel, toggleTheme, mounted } = useThemeMode();
 
   useEffect(() => {
@@ -38,29 +39,35 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const providerMeta = PROVIDER_META[settings.provider];
+  const storageKeyName = `llm_api_key_${settings.provider}`;
+
   useEffect(() => {
-    const savedKey = localStorage.getItem("openai_api_key");
+    const savedKey = localStorage.getItem(storageKeyName);
     if (savedKey) {
       setApiKey(savedKey);
       setApiKeySaved(true);
+    } else {
+      setApiKey("");
+      setApiKeySaved(false);
     }
-  }, []);
+  }, [storageKeyName]);
 
   const handleSaveApiKey = () => {
     if (!apiKey.trim()) {
-      addToast({ message: "Please enter your OpenAI API key.", type: "error" });
+      addToast({ message: `Please enter your ${providerMeta.name} API key.`, type: "error" });
       return;
     }
 
-    if (!apiKey.startsWith("sk-")) {
+    if (!providerMeta.validateKey(apiKey)) {
       addToast({
-        message: 'Invalid API key. It should start with "sk-".',
+        message: `Invalid API key format for ${providerMeta.name}.`,
         type: "error",
       });
       return;
     }
 
-    localStorage.setItem("openai_api_key", apiKey);
+    localStorage.setItem(storageKeyName, apiKey);
     setApiKeySaved(true);
     setShowApiKeyInput(false);
     addToast({
@@ -72,8 +79,7 @@ export default function Home() {
   const handleRemoveApiKey = async () => {
     const confirmed = await confirm({
       title: "Remove API key?",
-      description:
-        "This will remove your saved OpenAI API key from this browser. You can add it again later.",
+      description: `This will remove your saved ${providerMeta.name} API key from this browser. You can add it again later.`,
       confirmLabel: "Remove key",
       variant: "danger",
     });
@@ -82,7 +88,7 @@ export default function Home() {
       return;
     }
 
-    localStorage.removeItem("openai_api_key");
+    localStorage.removeItem(storageKeyName);
     setApiKey("");
     setApiKeySaved(false);
     addToast({ message: "API key removed.", type: "info" });
@@ -114,12 +120,15 @@ export default function Home() {
       .filter(Boolean)
       .join("\n\n");
     try {
+      const currentApiKey = localStorage.getItem(storageKeyName);
       const response = await fetch("/api/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectDescription: classificationPayload,
-          apiKey: localStorage.getItem("openai_api_key"),
+          apiKey: currentApiKey,
+          provider: settings.provider,
+          model: settings.model,
         }),
       });
 
@@ -174,7 +183,9 @@ export default function Home() {
           projectDescription: generationPayload,
           category: normalizedCategory,
           answers: autoContext,
-          apiKey: localStorage.getItem("openai_api_key"),
+          apiKey: currentApiKey,
+          provider: settings.provider,
+          model: settings.model,
         }),
       });
 
@@ -268,13 +279,62 @@ export default function Home() {
             </div>
           )}
 
-          {/* API Key Section */}
+          {/* Provider & API Key Section */}
           <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border-l-4 border-blue-600">
+            {/* Provider selector */}
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wide">
+                LLM Provider
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {PROVIDER_KEYS.map((key) => {
+                  const meta = PROVIDER_META[key];
+                  const isActive = settings.provider === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        updateSettings({ ...settings, provider: key, model: meta.defaultModel });
+                        setShowApiKeyInput(false);
+                      }}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                        isActive
+                          ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                          : "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:border-blue-400"
+                      }`}
+                    >
+                      <i className={`fas ${meta.icon}`}></i>
+                      {meta.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Model selector */}
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wide">
+                Model
+              </label>
+              <select
+                value={settings.model}
+                onChange={(e) => updateSettings({ ...settings, model: e.target.value })}
+                className="w-full p-2.5 border-2 border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white text-sm"
+              >
+                {providerMeta.models.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* API key status / input */}
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
                   <i className="fas fa-key text-blue-600 dark:text-blue-400"></i>
-                  OpenAI API Key
+                  {providerMeta.name} API Key
                 </h3>
                 {apiKeySaved ? (
                   <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-1">
@@ -284,7 +344,7 @@ export default function Home() {
                 ) : (
                   <p className="text-sm text-blue-700 dark:text-blue-300 flex items-center gap-1">
                     <i className="fas fa-exclamation-circle"></i>
-                    Please add your OpenAI API key to continue
+                    Please add your {providerMeta.name} API key to continue
                   </p>
                 )}
               </div>
@@ -299,21 +359,21 @@ export default function Home() {
             {showApiKeyInput && (
               <div className="mt-4 space-y-3">
                 <p className="text-xs text-slate-600 dark:text-slate-300">
-                  Get your free API key at{" "}
+                  Get your API key at{" "}
                   <a
-                    href="https://platform.openai.com/account/api-keys"
+                    href={providerMeta.keyHelpUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                   >
-                    platform.openai.com/account/api-keys
+                    {providerMeta.keyHelpLabel}
                   </a>
                 </p>
                 <input
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-proj-..."
+                  placeholder={providerMeta.keyPlaceholder}
                   className="w-full p-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white text-sm"
                 />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
