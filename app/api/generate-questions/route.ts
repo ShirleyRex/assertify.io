@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OpenAI } from "openai";
+import { createProvider, isValidProviderKey, normalizeProviderError } from "@/lib/llm";
 
 export async function POST(req: NextRequest) {
   try {
-    const { projectDescription, category, apiKey } = await req.json();
+    const { projectDescription, category, apiKey, provider = "openai", model } = await req.json();
 
     console.log("Received:", {
       projectDescription: !!projectDescription,
       category,
+      provider,
       apiKey: !!apiKey,
     });
 
@@ -22,9 +23,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "API key required" }, { status: 400 });
     }
 
-    const openai = new OpenAI({
-      apiKey: apiKey,
-    });
+    if (!isValidProviderKey(provider)) {
+      return NextResponse.json({ error: `Unsupported provider: "${provider}"` }, { status: 400 });
+    }
+
+    const llm = createProvider(provider, apiKey, model);
 
     const prompt = `You are a QA expert. Based on the following project description and category, generate exactly 10 specific, actionable questions that a developer should answer to help write comprehensive tests for this project.
 
@@ -42,9 +45,8 @@ Format your response as a JSON array of strings, like this:
 
 Respond ONLY with the JSON array, no additional text or markdown.`;
 
-    const message = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
+    const content = await llm.chatCompletion(
+      [
         {
           role: "system",
           content:
@@ -55,10 +57,8 @@ Respond ONLY with the JSON array, no additional text or markdown.`;
           content: prompt,
         },
       ],
-      temperature: 0.7,
-    });
-
-    const content = message.choices[0].message.content || "[]";
+      { temperature: 0.7 }
+    );
 
     let questions;
     try {
@@ -84,16 +84,18 @@ Respond ONLY with the JSON array, no additional text or markdown.`;
     }
 
     return NextResponse.json({ questions });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Generate questions error:", error);
 
-    if (error.status === 401) {
+    const normalized = normalizeProviderError(error);
+
+    if (normalized.isAuthError) {
       return NextResponse.json({ error: "Unauthorized: Invalid API key" }, { status: 401 });
     }
 
     return NextResponse.json(
-      { error: "Failed to generate questions", details: String(error.message) },
-      { status: 500 }
+      { error: "Failed to generate questions", details: normalized.message },
+      { status: normalized.status }
     );
   }
 }
