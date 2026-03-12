@@ -25,7 +25,23 @@ export function normalizeProviderError(error: unknown): NormalizedLLMError {
         ? err.statusCode
         : 500;
 
-  const message = typeof err?.message === "string" ? err.message : String(error);
+  let message = typeof err?.message === "string" ? err.message : String(error);
+
+  // Sometimes SDKs return a JSON payload embedded in the error string.
+  try {
+    const jsonStart = message.indexOf("{");
+    const jsonEnd = message.lastIndexOf("}");
+    if (jsonStart !== -1 && jsonEnd > jsonStart) {
+      const parsed = JSON.parse(message.substring(jsonStart, jsonEnd + 1));
+      if (parsed.error && typeof parsed.error.message === "string") {
+        message = parsed.error.message;
+      } else if (typeof parsed.message === "string") {
+        message = parsed.message;
+      }
+    }
+  } catch {
+    // Ignore parsing errors, stick to the original message
+  }
 
   const isAuthError =
     status === 401 ||
