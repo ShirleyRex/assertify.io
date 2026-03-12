@@ -145,7 +145,7 @@ export default function Home() {
 
       if (!response.ok) {
         addToast({
-          message: `Error: ${data.error || "Failed to classify project"}`,
+          message: `Error: ${data.error || "Failed to classify project"}${data.details ? ` (${data.details})` : ""}`,
           type: "error",
         });
         return;

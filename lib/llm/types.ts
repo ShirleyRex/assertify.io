@@ -34,8 +34,8 @@ export const PROVIDER_META: Record<ProviderKey, ProviderMeta> = {
     keyPlaceholder: "sk-proj-...",
     keyHelpUrl: "https://platform.openai.com/account/api-keys",
     keyHelpLabel: "platform.openai.com/account/api-keys",
-    defaultModel: "gpt-4",
-    models: ["gpt-4", "gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"],
+    defaultModel: "gpt-4o-mini",
+    models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
     validateKey: (key: string) => key.startsWith("sk-"),
   },
   anthropic: {
@@ -45,8 +45,14 @@ export const PROVIDER_META: Record<ProviderKey, ProviderMeta> = {
     keyPlaceholder: "sk-ant-...",
     keyHelpUrl: "https://console.anthropic.com/settings/keys",
     keyHelpLabel: "console.anthropic.com/settings/keys",
-    defaultModel: "claude-sonnet-4-20250514",
-    models: ["claude-sonnet-4-20250514", "claude-opus-4-20250514", "claude-3-5-haiku-20241022"],
+    defaultModel: "claude-3-5-sonnet-latest",
+    models: [
+      "claude-3-5-sonnet-latest",
+      "claude-3-5-haiku-latest",
+      "claude-3-opus-latest",
+      "claude-3-sonnet-20240229",
+      "claude-3-haiku-20240307",
+    ],
     validateKey: (key: string) => key.startsWith("sk-ant-"),
   },
   gemini: {
@@ -56,8 +62,8 @@ export const PROVIDER_META: Record<ProviderKey, ProviderMeta> = {
     keyPlaceholder: "AIza...",
     keyHelpUrl: "https://aistudio.google.com/apikey",
     keyHelpLabel: "aistudio.google.com/apikey",
-    defaultModel: "gemini-2.0-flash",
-    models: ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash"],
+    defaultModel: "gemini-2.5-flash",
+    models: ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-flash-latest"],
     validateKey: (key: string) => key.length > 10,
   },
 };
