@@ -10,7 +10,8 @@ export type {
   ProviderKey,
   ProviderMeta,
 } from "./types";
-export { PROVIDER_META, PROVIDER_KEYS, isValidProviderKey } from "./types";
+import { PROVIDER_META, PROVIDER_KEYS, isValidProviderKey } from "./types";
+export { PROVIDER_META, PROVIDER_KEYS, isValidProviderKey };
 export { normalizeProviderError } from "./errors";
 export type { NormalizedLLMError } from "./errors";
 
@@ -19,14 +20,22 @@ export function createProvider(
   apiKey: string,
   model?: string
 ): LLMProvider {
+  const meta = PROVIDER_META[providerKey];
+  if (!meta) {
+    throw new Error(`Unsupported LLM provider: ${providerKey}`);
+  }
+
+  const resolvedModel = model || meta.defaultModel;
+  if (!meta.models.includes(resolvedModel)) {
+    throw new Error(`Unsupported model '${resolvedModel}' for provider '${providerKey}'`);
+  }
+
   switch (providerKey) {
     case "openai":
-      return new OpenAIProvider(apiKey, model);
+      return new OpenAIProvider(apiKey, resolvedModel);
     case "anthropic":
-      return new AnthropicProvider(apiKey, model);
+      return new AnthropicProvider(apiKey, resolvedModel);
     case "gemini":
-      return new GeminiProvider(apiKey, model);
-    default:
-      throw new Error(`Unsupported LLM provider: ${providerKey}`);
+      return new GeminiProvider(apiKey, resolvedModel);
   }
 }

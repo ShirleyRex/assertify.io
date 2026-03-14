@@ -5,7 +5,7 @@ export class GeminiProvider implements LLMProvider {
   private genAI: GoogleGenerativeAI;
   private defaultModel: string;
 
-  constructor(apiKey: string, defaultModel = "gemini-2.0-flash") {
+  constructor(apiKey: string, defaultModel = "gemini-2.5-flash") {
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.defaultModel = defaultModel;
   }
@@ -44,9 +44,9 @@ export class GeminiProvider implements LLMProvider {
 
       // Use chat for multi-turn requests
       const chat = model.startChat({
-        history: nonSystemMessages.slice(0, -1).map((m) => ({
+        history: nonSystemMessages.slice(0, -1).map((m, index) => ({
           role: m.role === "assistant" ? "model" : "user",
-          parts: [{ text: m.content }],
+          parts: [{ text: index === 0 ? firstMessageContent : m.content }],
         })),
       });
 

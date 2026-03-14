@@ -43,7 +43,7 @@ export default function Home() {
   const storageKeyName = `llm_api_key_${settings.provider}`;
 
   useEffect(() => {
-    const savedKey = localStorage.getItem(storageKeyName);
+    const savedKey = sessionStorage.getItem(storageKeyName);
     if (savedKey) {
       setApiKey(savedKey);
       setApiKeySaved(true);
@@ -67,7 +67,7 @@ export default function Home() {
       return;
     }
 
-    localStorage.setItem(storageKeyName, apiKey);
+    sessionStorage.setItem(storageKeyName, apiKey);
     setApiKeySaved(true);
     setShowApiKeyInput(false);
     addToast({
@@ -88,7 +88,7 @@ export default function Home() {
       return;
     }
 
-    localStorage.removeItem(storageKeyName);
+    sessionStorage.removeItem(storageKeyName);
     setApiKey("");
     setApiKeySaved(false);
     addToast({ message: "API key removed.", type: "info" });
@@ -120,7 +120,7 @@ export default function Home() {
       .filter(Boolean)
       .join("\n\n");
     try {
-      const currentApiKey = localStorage.getItem(storageKeyName);
+      const currentApiKey = sessionStorage.getItem(storageKeyName);
       const response = await fetch("/api/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -377,7 +377,8 @@ export default function Home() {
                   className="w-full p-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white text-sm"
                 />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Your API key is stored locally in your browser only. Never shared with us.
+                  Your API key is kept locally for the current session. Note: Browser storage is not
+                  encrypted.
                 </p>
                 <div className="flex gap-2">
                   <button

@@ -44,7 +44,7 @@ Assertify is an intelligent testing assistant that analyzes your project descrip
 1. Install dependencies: `npm install`
 2. Start the dev server: `npm run dev`
 3. Open http://localhost:3000 in your browser
-4. **Enter your API key securely directly in the UI** (Keys are stored locally in your browser, no `.env` file required!)
+4. **Enter your API key in the UI**. Keys are stored in your browser's `sessionStorage` in plaintext for convenience; they are not encrypted or transmitted to our servers. Be aware that browser extensions or any cross-site scripting (XSS) vulnerability in this tab could potentially access this session data.
 
 ## How to Use
 
