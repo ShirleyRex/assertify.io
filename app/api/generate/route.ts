@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OpenAI } from "openai";
+import { createProvider, isValidProviderKey, normalizeProviderError } from "@/lib/llm";
 
 export async function POST(req: NextRequest) {
   try {
-    const { projectDescription, category, answers, apiKey } = await req.json();
+    const {
+      projectDescription,
+      category,
+      answers,
+      apiKey,
+      provider = "openai",
+      model,
+    } = await req.json();
 
     if (!projectDescription || !category || !answers) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -13,9 +20,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "API key required" }, { status: 400 });
     }
 
-    const openai = new OpenAI({
-      apiKey: apiKey,
-    });
+    if (!isValidProviderKey(provider)) {
+      return NextResponse.json({ error: `Unsupported provider: "${provider}"` }, { status: 400 });
+    }
+
+    const llm = createProvider(provider, apiKey, model);
 
     const prompt = `You are a QA expert. Generate comprehensive test cases for the following project:
 
@@ -52,9 +61,8 @@ Generate 12-15 diverse test cases covering:
 
 Respond ONLY with valid JSON, no markdown or extra text.`;
 
-    const message = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
+    const content = await llm.chatCompletion(
+      [
         {
           role: "system",
           content:
@@ -65,10 +73,8 @@ Respond ONLY with valid JSON, no markdown or extra text.`;
           content: prompt,
         },
       ],
-      temperature: 0.7,
-    });
-
-    const content = message.choices[0].message.content || "{}";
+      { temperature: 0.7 }
+    );
 
     let parsedResponse;
     try {
@@ -83,16 +89,18 @@ Respond ONLY with valid JSON, no markdown or extra text.`;
     }
 
     return NextResponse.json(parsedResponse);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Generation error:", error);
 
-    if (error.status === 401) {
+    const normalized = normalizeProviderError(error);
+
+    if (normalized.isAuthError) {
       return NextResponse.json({ error: "Unauthorized: Invalid API key" }, { status: 401 });
     }
 
     return NextResponse.json(
-      { error: "Test case generation failed", details: String(error.message) },
-      { status: 500 }
+      { error: "Test case generation failed", details: normalized.message },
+      { status: normalized.status }
     );
   }
 }

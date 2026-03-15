@@ -37,27 +37,26 @@ Assertify is an intelligent testing assistant that analyzes your project descrip
 - Next.js 14
 - TypeScript
 - Tailwind CSS
-- OpenAI API
+- Multi-LLM Support (OpenAI, Anthropic Claude, Google Gemini)
 
 ## Installation
 
 1. Install dependencies: `npm install`
-2. Copy the environment file: `cp .env.example .env.local`
-3. Add your OpenAI API key to `.env.local`
-4. Start the dev server: `npm run dev`
-5. Open http://localhost:3000 in your browser
+2. Start the dev server: `npm run dev`
+3. Open http://localhost:3000 in your browser
+4. **Enter your API key in the UI**. Keys are stored in your browser's `sessionStorage` in plaintext for convenience; they are not encrypted or transmitted to our servers. Be aware that browser extensions or any cross-site scripting (XSS) vulnerability in this tab could potentially access this session data.
 
 ## How to Use
 
-1. Provide your project description from the landing page; the app automatically classifies the category.
-2. Answer the context questions (or skip) so the generator can tailor scenarios to your needs.
-3. Review generated tests on the results page, filter by type or priority, and inspect the suggested testing strategy and risk areas.
-4. Generate boilerplate code for your preferred frameworks or export the dataset as JSON/CSV.
-5. Manage settings at `/settings` to define default context, disable frameworks, and control boilerplate sample sizes.
+1. Select your preferred LLM provider (OpenAI, Anthropic, or Gemini) and model from the landing page or settings.
+2. Provide your project description from the landing page; the app automatically classifies the category.
+3. Answer the context questions (or skip) so the generator can tailor scenarios to your needs.
+4. Review generated tests on the results page, filter by type or priority, and inspect the suggested testing strategy and risk areas.
+5. Generate boilerplate code for your preferred frameworks or export the dataset as JSON/CSV.
+6. Manage settings at `/settings` to define default context, disable frameworks, and control boilerplate sample sizes.
 
 ## Future Improvements
 
-- Allow selecting different LLM providers and models per generation so teams can optimize for latency or cost.
 - Offer more granular configuration for question generation (e.g., required question count, tone, or domain presets).
 - Optimize large test suites by streaming responses and deduplicating similar scenarios before persistence.
 - Provide deeper integrations with CI/CD by exporting ready-to-run suites or syncing with test management tools.

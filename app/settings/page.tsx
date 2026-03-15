@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSettings } from "@/components/SettingsProvider";
 import { useToast } from "@/components/ToastProvider";
-import { boilerplateOptions, defaultSettings, testTypeOptions } from "@/lib/settings";
+import {
+  boilerplateOptions,
+  defaultSettings,
+  testTypeOptions,
+  PROVIDER_META,
+  PROVIDER_KEYS,
+} from "@/lib/settings";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -46,6 +52,56 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-8">
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">LLM Provider</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Choose which AI provider and model to use for test generation.
+              </p>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {PROVIDER_KEYS.map((key) => {
+                  const meta = PROVIDER_META[key];
+                  const isActive = formState.provider === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          provider: key,
+                          model: meta.defaultModel,
+                        }))
+                      }
+                      className={`flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-medium transition-all ${
+                        isActive
+                          ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md dark:border-blue-400 dark:bg-blue-900/30 dark:text-blue-300"
+                          : "border-slate-200 bg-white/70 text-slate-700 shadow-sm hover:border-blue-400 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-200"
+                      }`}
+                    >
+                      <i className={`fas ${meta.icon}`}></i>
+                      {meta.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Model
+                </label>
+                <select
+                  value={formState.model}
+                  onChange={(e) => setFormState((prev) => ({ ...prev, model: e.target.value }))}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-white"
+                >
+                  {PROVIDER_META[formState.provider].models.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </section>
+
             <section>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Default context

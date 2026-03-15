@@ -38,7 +38,8 @@ export default function QuestionsPage() {
       // Fetch custom questions based on project description
       setGeneratingQuestions(true);
       try {
-        const apiKey = localStorage.getItem("openai_api_key");
+        const storageKeyName = `llm_api_key_${settings.provider}`;
+        const apiKey = sessionStorage.getItem(storageKeyName);
 
         const response = await fetch("/api/generate-questions", {
           method: "POST",
@@ -47,6 +48,8 @@ export default function QuestionsPage() {
             projectDescription: savedProject,
             category: savedCategory,
             apiKey: apiKey,
+            provider: settings.provider,
+            model: settings.model,
           }),
         });
 
@@ -72,7 +75,7 @@ export default function QuestionsPage() {
     };
 
     loadQuestions();
-  }, [router]);
+  }, [router, settings.provider, settings.model]);
 
   const handleAnswerChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -93,7 +96,8 @@ export default function QuestionsPage() {
 
     setLoading(true);
     try {
-      const apiKey = localStorage.getItem("openai_api_key");
+      const storageKeyName = `llm_api_key_${settings.provider}`;
+      const apiKey = sessionStorage.getItem(storageKeyName);
 
       const supplementalContext: string[] = [];
       if (projectRequirements.trim()) {
@@ -111,6 +115,8 @@ export default function QuestionsPage() {
           category,
           answers: [...answers, ...supplementalContext],
           apiKey: apiKey,
+          provider: settings.provider,
+          model: settings.model,
         }),
       });
 
